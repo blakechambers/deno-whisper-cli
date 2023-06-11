@@ -31,8 +31,8 @@ deno install \
 --name your_custom_executable_name
 --allow-env=OPENAI_API_KEY \
 --allow-run=sox,pbcopy     \
---allow-read=./temp.wav      \
---allow-write=./temp.wav     \
+--allow-read=./temp.mp3      \
+--allow-write=./temp.mp3     \
 --allow-net=api.openai.com \
 https://deno.land/x/whisper_cli/cli.ts
 ```
@@ -54,6 +54,6 @@ your_custom_executable_name
 - add quiet option to configure the logger to not prompt as much
 - detect stdout and route prompt text stderr
 - accept an option to write content to a file (instead of requiring stdout)
-- use a configurable temp directory to store the file
+- use a configurable temp directory and file name for the audio file
 - enable/disable cleanup of the audio file
 - colorize and organize output
