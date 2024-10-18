@@ -46,7 +46,7 @@ your_custom_executable_name
 ## Usage
 
 ```bash
-> deno run main.ts --help
+> deno run cli.ts --help
 ```
 
 ## Future ideas
