@@ -1,4 +1,4 @@
-import { buildTask, main, OpenAI, signal } from "./deps.ts";
+import { buildTask, main, OpenAI } from "./deps.ts";
 import { pbcopy } from "./pbcopy.ts";
 const openAI = new OpenAI(Deno.env.get("OPENAI_API_KEY")!);
 
@@ -15,6 +15,17 @@ async function whisperCli() {
 
   console.log("Recording now! Press ctrl-c to stop...");
 
+  // define a promise object that we can wait on.
+  const recording = new Promise<void>((resolve, _) => {
+    const sigIntHandler = () => {
+      console.log("Recording stopped.");
+      Deno.removeSignalListener("SIGINT", sigIntHandler);
+      resolve();
+    };
+
+    Deno.addSignalListener("SIGINT", sigIntHandler);
+  });
+
   const command = new Deno.Command("sox", {
     args: ["-d", recordFileName],
     stdout: "piped",
@@ -23,15 +34,11 @@ async function whisperCli() {
 
   const soxProcess = command.spawn();
 
-  const sig = signal("SIGUSR1", "SIGINT");
+  // sleep for 1 second to allow the process to start
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  for await (const _ of sig) {
-    soxProcess.kill("SIGINT");
-
-    break;
-  }
-
-  sig.dispose();
+  // wait for the process to finish
+  await recording;
 
   const { code, stderr } = await soxProcess.output();
 
